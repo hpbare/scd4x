@@ -4,8 +4,7 @@
  *        Supports SCD40, SCD41, SCD43
  *        Based on Datasheet v1.7 - April 2025
  */
-#ifndef SCD4X_H
-#define SCD4X_H
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -16,8 +15,6 @@ extern "C" {
 #endif
 
 #define SCD4X_I2C_ADDR 0x62
-
-
 
 /**
  * @brief Write len bytes to device; return 0 on success
@@ -320,5 +317,3 @@ SCD4x_Status SCD4x_GetASCStandardPeriod(SCD4x_Dev *dev, uint16_t *period_h);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* SCD4X_H */
