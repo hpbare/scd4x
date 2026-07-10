@@ -3,8 +3,6 @@
 Bare-metal C driver for Sensirion SCD4x CO2 sensors (SCD40, SCD41, SCD43).
 Based on **Datasheet v1.7 – April 2025**. Platform-independent via HAL function pointer injection.
 
----
-
 ## Supported Sensors
 
 | Model | Periodic | Low-Power Periodic | Single-Shot | Power Down/Wake Up |
@@ -13,8 +11,6 @@ Based on **Datasheet v1.7 – April 2025**. Platform-independent via HAL functio
 | SCD41 | Yes | Yes | Yes | Yes |
 | SCD43 | Yes | Yes | Yes | Yes |
 
----
-
 ## Files
 
 ```
@@ -22,8 +18,6 @@ scd4x.h        - Public API, types, constants
 scd4x.c        - Driver implementation
 scd4x_def.h    - Register and constant definitions
 ```
-
----
 
 ## Quick Start
 
@@ -84,8 +78,6 @@ while (1) {
 }
 ```
 
----
-
 ## API Reference
 
 ### Initialization
@@ -96,9 +88,13 @@ SCD4x_Status SCD4x_Init(SCD4x_Dev *dev);
 
 Waits for power-up (30ms), then verifies communication by reading the serial number.
 
----
-
 ### Measurement Modes
+
+| Mode | Interval | Command |
+|------|----------|---------|
+| `SCD4X_MODE_PERIODIC` | 5s | `start_periodic_measurement` |
+| `SCD4X_MODE_PERIODIC_LOW_POWER` | 30s | `start_low_power_periodic_measurement` |
+| `SCD4X_MODE_SINGLE_SHOT` | on-demand (5s minimum) | `measure_single_shot` (SCD41/43 only) |
 
 ```c
 SCD4x_Status SCD4x_StartMeasurement(SCD4x_Dev *dev, SCD4x_Mode mode);
@@ -106,12 +102,6 @@ SCD4x_Status SCD4x_Stop(SCD4x_Dev *dev);
 SCD4x_Status SCD4x_ReadMeasurement(SCD4x_Dev *dev, SCD4x_Measurement *out);
 SCD4x_Status SCD4x_GetDataReadyStatus(SCD4x_Dev *dev, bool *ready);
 ```
-
-| Mode | Interval | Command |
-|------|----------|---------|
-| `SCD4X_MODE_PERIODIC` | 5s | `start_periodic_measurement` |
-| `SCD4X_MODE_PERIODIC_LOW_POWER` | 30s | `start_low_power_periodic_measurement` |
-| `SCD4X_MODE_SINGLE_SHOT` | on-demand | `measure_single_shot` (SCD41/43 only) |
 
 **Measurement data:**
 
@@ -122,8 +112,6 @@ typedef struct {
     float    humidity_rh;   /* Relative humidity in %   */
 } SCD4x_Measurement;
 ```
-
----
 
 ### On-Chip Signal Compensation (Section 3.7)
 
@@ -145,8 +133,6 @@ SCD4x_Status SCD4x_GetAmbientPressure(SCD4x_Dev *dev, uint32_t *pressure_pa);
 ```
 
 > Use **either** altitude or ambient pressure compensation, not both simultaneously.
-
----
 
 ### Field Calibration (Section 3.8)
 
@@ -170,8 +156,6 @@ SCD4x_Status SCD4x_GetASCInitialPeriod(SCD4x_Dev *dev, uint16_t *period_h);
 SCD4x_Status SCD4x_SetASCStandardPeriod(SCD4x_Dev *dev, uint16_t period_h); /* default: 156h */
 SCD4x_Status SCD4x_GetASCStandardPeriod(SCD4x_Dev *dev, uint16_t *period_h);
 ```
-
----
 
 ### Advanced Features (Section 3.10)
 
@@ -203,8 +187,6 @@ SCD4X_VARIANT_SCD41  /* 0x1000 */
 SCD4X_VARIANT_SCD43  /* 0x5000 */
 ```
 
----
-
 ### Single-Shot Mode (SCD41/SCD43 only — Section 3.11)
 
 ```c
@@ -222,8 +204,6 @@ SCD4x_Status SCD4x_PowerDown(SCD4x_Dev *dev);
 SCD4x_Status SCD4x_WakeUp(SCD4x_Dev *dev);
 ```
 
----
-
 ### Status Codes
 
 ```c
@@ -234,8 +214,6 @@ SCD4X_ERR_FRC       = -3   /* Forced recalibration failed      */
 SCD4X_ERR_NOT_READY = -4   /* Data not ready                   */
 SCD4X_ERR_PARAM     = -5   /* Invalid parameter or NULL ptr    */
 ```
-
----
 
 ## Usage Patterns
 
@@ -295,8 +273,6 @@ SCD4x_PersistSettings(&dev);   /* save to EEPROM */
 /* Settings now survive power cycle */
 ```
 
----
-
 ## Important Notes
 
 **Stop required before settings:** Sensor must be idle before get/set of temperature offset, altitude, ASC parameters. The driver calls `stop_periodic_measurement` and resumes automatically — except for ambient pressure which can be updated during measurement.
@@ -311,8 +287,6 @@ SCD4x_PersistSettings(&dev);   /* save to EEPROM */
 
 **Single-shot / Power-down:** Only available on SCD41 and SCD43. Calling these functions on an SCD40 will still transmit the command; behavior is undefined per datasheet.
 
----
-
 ## Limits & Defaults
 
 | Parameter | Min | Max | Default |
@@ -323,8 +297,6 @@ SCD4x_PersistSettings(&dev);   /* save to EEPROM */
 | ASC target | — | — | 400 ppm |
 | ASC initial period | multiples of 4 | — | 44 h |
 | ASC standard period | multiples of 4 | — | 156 h |
-
----
 
 ## CRC
 
